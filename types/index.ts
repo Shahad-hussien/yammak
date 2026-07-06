@@ -35,3 +35,11 @@ export interface Order {
     | "failed";
   delivered_at: string | null;
 }
+
+export interface DriverOrder {
+  id: string;
+  status: "assigned" | "picked_up" | "in_transit";
+  pickup_lat: number;
+  pickup_lng: number;
+  customers: { lat: number; lng: number; name: string } | null; // لأن ممكن الدمج بين الجدولين يفشل nullable
+}

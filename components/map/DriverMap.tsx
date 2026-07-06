@@ -2,12 +2,14 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { DriverOrder } from "@/types";
 
 interface DriverMapProps {
+  orders: DriverOrder[];
   current_lat: number;
   current_lng: number;
 }
-const DriverMap = ({ current_lat, current_lng }: DriverMapProps) => {
+const DriverMap = ({ orders, current_lat, current_lng }: DriverMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +36,20 @@ const DriverMap = ({ current_lat, current_lng }: DriverMapProps) => {
     L.Marker.prototype.options.icon = DefaultIcon;
 
     L.marker([current_lat, current_lng]).addTo(mapRef.current);
+
+    orders.forEach((order) => {
+      L.marker([order.pickup_lat, order.pickup_lng]).addTo(mapRef.current!);
+      if (
+        order.customers?.lat !== undefined ||
+        order.customers?.lng !== undefined
+      ) {
+        L.marker([order.customers?.lat, order.customers?.lng]).addTo(
+          mapRef.current!
+        );
+      } else {
+        console.log("Customers undefined");
+      }
+    });
 
     return () => {
       mapRef.current?.remove();

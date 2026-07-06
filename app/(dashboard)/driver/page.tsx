@@ -3,6 +3,8 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import DriverMap from "@/components/map/DriverMapWrapper";
+import { getDriverOrders } from "@/lib/actions/orders";
+
 const DriverPage = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -12,18 +14,23 @@ const DriverPage = async () => {
   }
   const { data: drivers } = await supabase
     .from("drivers")
-    .select("current_lat, current_lng")
+    .select("id, current_lat, current_lng")
     .eq("user_id", session?.user.id)
     .single();
 
   if (!drivers) return <p>Driver not found.</p>;
 
+  const orders = await getDriverOrders(drivers.id);
   if (!drivers?.current_lat || !drivers?.current_lng) {
     return <p>Location not available</p>;
   }
+
+  console.log("All orders:");
+  console.log(orders);
   return (
     <div className="h-[calc(100vh-4rem)] w-full">
       <DriverMap
+        orders={orders}
         current_lat={drivers.current_lat}
         current_lng={drivers.current_lng}
       />
