@@ -17,7 +17,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     <div className="flex h-screen w-screen overflow-hidden">
       <SidebarProvider>
         <AppSidebar role={session.user.role} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="h-full flex-1 overflow-y-auto p-6">
           <SidebarTrigger />
           {children}
         </main>
