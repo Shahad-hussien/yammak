@@ -2,13 +2,26 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { DriverOrder } from "@/types";
+import { StopPoint } from "@/types";
 
 interface DriverMapProps {
-  orders: DriverOrder[];
+  orders: StopPoint[];
   current_lat: number;
   current_lng: number;
 }
+const shopIcon = L.divIcon({
+  html: "🏪",
+  className: "",
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
+
+const personIcon = L.divIcon({
+  html: "👤",
+  className: "",
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
 const DriverMap = ({ orders, current_lat, current_lng }: DriverMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,14 +51,26 @@ const DriverMap = ({ orders, current_lat, current_lng }: DriverMapProps) => {
     L.marker([current_lat, current_lng]).addTo(mapRef.current);
 
     orders.forEach((order) => {
-      L.marker([order.pickup_lat, order.pickup_lng]).addTo(mapRef.current!);
+      L.marker([order.pickup.lat, order.pickup.lng], { icon: shopIcon })
+        .bindPopup(`Pickup order: ${order.customer?.name} `)
+        .addTo(mapRef.current!);
       if (
-        order.customers?.lat !== undefined ||
-        order.customers?.lng !== undefined
+        order.customer?.lat !== undefined &&
+        order.customer?.lng !== undefined
       ) {
-        L.marker([order.customers?.lat, order.customers?.lng]).addTo(
-          mapRef.current!
-        );
+        L.marker([order.customer.lat, order.customer.lng], {
+          icon: personIcon,
+        })
+          .bindPopup(`Customer: ${order.customer.name}`)
+          .addTo(mapRef.current!);
+
+        const firstStop = orders[0];
+        if (firstStop) {
+          L.polyline([
+            [current_lat, current_lng],
+            [firstStop.pickup.lat, firstStop.pickup.lng],
+          ]).addTo(mapRef.current!);
+        }
       } else {
         console.log("Customers undefined");
       }

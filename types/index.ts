@@ -43,3 +43,9 @@ export interface DriverOrder {
   pickup_lng: number;
   customers: { lat: number; lng: number; name: string } | null; // لأن ممكن الدمج بين الجدولين يفشل nullable
 }
+
+export interface StopPoint {
+  id: string;
+  pickup: { lat: number; lng: number };
+  customer: { lat: number; lng: number; name: string } | null;
+}
